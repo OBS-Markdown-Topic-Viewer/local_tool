@@ -1,0 +1,51 @@
+body {
+  background: transparent;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  font-size: 28px;
+  line-height: 1.6;
+}
+
+/* ===== 見出し ===== */
+
+h1 {
+  font-size: 42px;
+  padding: 0.3em 0.6em;
+  background: linear-gradient(90deg, #2E86C1, #5DADE2);
+  border-radius: 14px;
+  color: #ffffff; /* 見出しは白文字 */
+}
+
+h2 {
+  font-size: 34px;
+  margin-top: 1em;
+  padding-left: 0.6em;
+  border-left: 8px solid #F9E79F;
+  color: #1B2631; /* 濃色 */
+}
+
+/* ===== リスト ===== */
+
+ul {
+  padding-left: 1.2em;
+}
+
+li {
+  margin-bottom: 0.5em;
+  color: #1B2631; /* 通常話題は濃色文字 */
+}
+
+/* ===== 今話している話題 ===== */
+
+.current {
+  background: #FFF3CD;          /* 薄い黄色 */
+  color: #1B2631;               /* 濃い文字色 */
+  border-radius: 12px;
+  padding: 0.25em 0.5em;
+  box-shadow: 0 0 0 2px rgba(249,231,159,0.6);
+}
+
+.current::before {
+  content: "▶ ";
+  color: #D68910;
+  font-weight: bold;
+}

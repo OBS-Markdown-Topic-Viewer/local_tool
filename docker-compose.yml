@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  obs-md:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./md:/app/md
+      - ./state.json:/app/state.json

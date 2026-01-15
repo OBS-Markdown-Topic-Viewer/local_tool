@@ -1,0 +1,25 @@
+{
+  "Name": "OBS Markdown Topic Viewer",
+  "Pages": [
+    {
+      "Name": "Topic Control",
+      "Buttons": [
+        {
+          "Title": "▶ Next",
+          "Method": "POST",
+          "Url": "http://localhost:3000/next"
+        },
+        {
+          "Title": "◀ Prev",
+          "Method": "POST",
+          "Url": "http://localhost:3000/prev"
+        },
+        {
+          "Title": "📢 Goto",
+          "Method": "POST",
+          "Url": "http://localhost:3000/goto/3"
+        }
+      ]
+    }
+  ]
+}
