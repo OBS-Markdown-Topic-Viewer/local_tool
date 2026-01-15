@@ -1,4 +1,4 @@
-#サンプルイメージ
+# サンプルイメージ
 
 ![Darkイメージ](https://github.com/OBS-Markdown-Topic-Viewer/local_tool/blob/main/sample_image/image.png)
 
