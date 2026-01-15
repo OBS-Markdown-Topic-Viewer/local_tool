@@ -4,10 +4,10 @@ import { execSync } from "child_process";
 
 const app = express();
 const STATE_FILE = "./state.json";
+const MD_FILE = "./md/topic.md";
 
 /* -------------------------
-   起動時 state
-   themeだけ引き継ぐ
+   state 読み込み
 ------------------------- */
 function loadStartupState() {
   if (!fs.existsSync(STATE_FILE)) {
@@ -43,16 +43,45 @@ function saveState(state) {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
+/* -------------------------
+   render
+------------------------- */
+let lastRender = 0;
 function render() {
+  const now = Date.now();
+  if (now - lastRender < 100) return; // 念のため
+  lastRender = now;
   execSync("node render.js", { stdio: "inherit" });
 }
 
-/* 起動時 */
+/* -------------------------
+   起動時
+------------------------- */
 const startupState = loadStartupState();
 saveState(startupState);
 render();
 
-/* API */
+/* -------------------------
+   Markdown ポーリング監視
+------------------------- */
+let lastMtime = 0;
+
+setInterval(() => {
+  try {
+    const stat = fs.statSync(MD_FILE);
+    if (stat.mtimeMs !== lastMtime) {
+      lastMtime = stat.mtimeMs;
+      console.log("topic.md changed → re-render");
+      render();
+    }
+  } catch {
+    // ファイルが一瞬消えても落とさない
+  }
+}, 500); // ★ 0.5秒ごとにチェック
+
+/* -------------------------
+   API
+------------------------- */
 app.post("/next", (req, res) => {
   const s = loadState();
   s.current++;
@@ -77,7 +106,9 @@ app.post("/theme/:name", (req, res) => {
   res.send("ok");
 });
 
-/* ★ キャッシュ禁止で静的配信 */
+/* -------------------------
+   キャッシュ無効
+------------------------- */
 app.use(
   express.static("public", {
     setHeaders: (res) => {
@@ -89,5 +120,5 @@ app.use(
 );
 
 app.listen(8080, () => {
-  console.log("Viewer: http://localhost:8080");
+  console.log("Viewer running at http://localhost:8080");
 });
