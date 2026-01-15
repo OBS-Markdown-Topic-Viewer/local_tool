@@ -1,0 +1,48 @@
+/* =========================
+   Board
+========================= */
+
+.topic-board {
+  background: linear-gradient(
+    to bottom,
+    rgba(235, 245, 251, 0.96),
+    rgba(220, 235, 245, 0.96)
+  );
+}
+
+/* =========================
+   h1 / Title
+========================= */
+
+.board-title {
+  background: #5DADE2;
+  color: #ffffff;
+}
+
+/* =========================
+   h2 / Section
+========================= */
+
+h2 {
+  background: rgba(93, 173, 226, 0.18);
+  color: #1B4F72;
+}
+
+/* =========================
+   Items（通常）
+========================= */
+
+.topic-item {
+  background: rgba(235, 245, 251, 0.85);
+  border-color: rgba(93, 173, 226, 0.4);
+  color: #1B2631;
+}
+
+/* =========================
+   Current
+========================= */
+
+.topic-item.current {
+  background: #F9E79F;
+  color: #1B2631;
+}

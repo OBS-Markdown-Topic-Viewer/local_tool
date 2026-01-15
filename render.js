@@ -1,51 +1,66 @@
 import fs from "fs";
-import MarkdownIt from "markdown-it";
 
-const STATE_FILE = "./state.json";
-const md = new MarkdownIt({ html: true });
-
-if (!fs.existsSync("./md/topic.md")) {
-  console.error("md/topic.md not found");
-  process.exit(1);
-}
-
-const state = fs.existsSync(STATE_FILE)
-  ? JSON.parse(fs.readFileSync(STATE_FILE))
-  : { current: 0 };
+const stateRaw = JSON.parse(fs.readFileSync("./state.json", "utf8"));
+const theme = stateRaw.theme || "purple";
 
 const src = fs.readFileSync("./md/topic.md", "utf8");
 const lines = src.split("\n");
 
+let title = "";
 let index = -1;
 
-const processed = lines.map(line => {
-  if (line.startsWith("- ")) {
-    index++;
-    if (index === state.current) {
-      return `- <span class="current">${line.slice(2)}</span>`;
-    }
+const blocks = [];
+
+for (const line of lines) {
+  if (line.startsWith("# ")) {
+    title = line.replace("# ", "").trim();
   }
-  return line;
-}).join("\n");
+  else if (line.startsWith("## ")) {
+    blocks.push({
+      type: "h2",
+      text: line.replace("## ", "").trim()
+    });
+  }
+  else if (line.startsWith("- ")) {
+    index++;
+    blocks.push({
+      type: "item",
+      text: line.slice(2).trim(),
+      current: index === stateRaw.current
+    });
+  }
+}
 
-const html = md.render(processed);
+const css =
+  fs.readFileSync("./styles/base.css", "utf8") +
+  fs.readFileSync(`./styles/theme-${theme}.css`, "utf8");
 
-const template = `
+const html = `
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<style>
-${fs.readFileSync("./style.css")}
-</style>
+<style>${css}</style>
 </head>
 <body>
-${html}
+  <div class="topic-board">
+    <div class="board-title">${title}</div>
+
+    <ul class="topic-list">
+      ${blocks.map(b => {
+        if (b.type === "h2") {
+          return `<h2>${b.text}</h2>`;
+        }
+        if (b.type === "item") {
+          return `<li class="topic-item${b.current ? " current" : ""}">${b.text}</li>`;
+        }
+        return "";
+      }).join("")}
+    </ul>
+  </div>
 </body>
 </html>
 `;
 
 fs.mkdirSync("./public", { recursive: true });
-fs.writeFileSync("./public/index.html", template);
-
-console.log("Rendered index.html");
+fs.writeFileSync("./public/index.html", html);
