@@ -229,9 +229,6 @@ docker compose up --build
 - 表示用
   http://localhost:8080
 
-- 操作用 API
-  http://localhost:3000
-
 # OBS への設定
 
 - OBSで「ソースを追加」から「ブラウザ」を選択します
