@@ -175,7 +175,7 @@ OBS-Markdown-Topic-Viewer.streamDeckProfile が同梱されています。
 4. 「インポート」または「読み込み」を選択します
 5. プロジェクト内の以下のファイルを指定します
 
-   streamdeck/OBS-Markdown-Topic-Viewer.streamDeckProfile
+   streamdeck/OBS Markdown Topic Viewer.streamDeckProfile
 
 6. インポートが完了すると、
    「OBS Markdown Topic Viewer」というプロファイルが追加されます

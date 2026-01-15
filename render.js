@@ -8,7 +8,6 @@ const lines = src.split("\n");
 
 let title = "";
 let index = -1;
-
 const blocks = [];
 
 for (const line of lines) {
@@ -16,10 +15,7 @@ for (const line of lines) {
     title = line.replace("# ", "").trim();
   }
   else if (line.startsWith("## ")) {
-    blocks.push({
-      type: "h2",
-      text: line.replace("## ", "").trim()
-    });
+    blocks.push({ type: "h2", text: line.replace("## ", "").trim() });
   }
   else if (line.startsWith("- ")) {
     index++;
@@ -41,19 +37,22 @@ const html = `
 <head>
 <meta charset="utf-8">
 <style>${css}</style>
+
+<!-- ★ 自動再読み込み（500ms） -->
+<script>
+  setTimeout(() => {
+    location.reload();
+  }, 500);
+</script>
 </head>
 <body>
   <div class="topic-board">
     <div class="board-title">${title}</div>
-
     <ul class="topic-list">
       ${blocks.map(b => {
-        if (b.type === "h2") {
-          return `<h2>${b.text}</h2>`;
-        }
-        if (b.type === "item") {
-          return `<li class="topic-item${b.current ? " current" : ""}">${b.text}</li>`;
-        }
+        if (b.type === "h2") return "<h2>" + b.text + "</h2>";
+        if (b.type === "item")
+          return "<li class='topic-item" + (b.current ? " current" : "") + "'>" + b.text + "</li>";
         return "";
       }).join("")}
     </ul>

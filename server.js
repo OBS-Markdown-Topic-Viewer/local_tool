@@ -6,18 +6,17 @@ const app = express();
 const STATE_FILE = "./state.json";
 
 /* -------------------------
-   state の安全なロード
-   （theme だけ復元対象）
+   起動時 state
+   themeだけ引き継ぐ
 ------------------------- */
-function loadStateForStartup() {
+function loadStartupState() {
   if (!fs.existsSync(STATE_FILE)) {
     return { current: 0, theme: "purple" };
   }
-
   try {
     const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
     return {
-      current: 0, // ★ 起動時は必ずリセット
+      current: 0,
       theme: typeof raw.theme === "string" ? raw.theme : "purple"
     };
   } catch {
@@ -25,14 +24,10 @@ function loadStateForStartup() {
   }
 }
 
-/* -------------------------
-   通常操作用 state ロード
-------------------------- */
 function loadState() {
   if (!fs.existsSync(STATE_FILE)) {
     return { current: 0, theme: "purple" };
   }
-
   try {
     const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
     return {
@@ -44,32 +39,20 @@ function loadState() {
   }
 }
 
-/* -------------------------
-   state 保存
-------------------------- */
 function saveState(state) {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
-/* -------------------------
-   HTML 再生成
-------------------------- */
 function render() {
   execSync("node render.js", { stdio: "inherit" });
 }
 
-/* -------------------------
-   起動時処理
-   - theme だけ引き継ぐ
-   - current は必ず 0
-------------------------- */
-const startupState = loadStateForStartup();
+/* 起動時 */
+const startupState = loadStartupState();
 saveState(startupState);
 render();
 
-/* -------------------------
-   API
-------------------------- */
+/* API */
 app.post("/next", (req, res) => {
   const s = loadState();
   s.current++;
@@ -94,14 +77,17 @@ app.post("/theme/:name", (req, res) => {
   res.send("ok");
 });
 
-/* -------------------------
-   静的ファイル配信
-------------------------- */
-app.use(express.static("public"));
+/* ★ キャッシュ禁止で静的配信 */
+app.use(
+  express.static("public", {
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    }
+  })
+);
 
-/* -------------------------
-   起動
-------------------------- */
 app.listen(8080, () => {
   console.log("Viewer: http://localhost:8080");
 });
