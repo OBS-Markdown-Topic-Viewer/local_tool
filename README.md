@@ -55,6 +55,21 @@ Docker Desktop を起動し、正常に動いていることを確認
 - md/topic.mdにてマークダウン形式で話題の管理をしています。
 - md/topic.mdの更新はDocker起動前、起動後どちらでも可能です。ファイルを更新・保存したタイミングで再読み込みします。
 
+# 起動方法と停止方法
+
+## windows
+
+- OBSMarkdownViewer起動.batとOBSMarkdownViewer停止.batを利用してください
+
+## Mac
+
+- OBSMarkdownViewer起動.commandとOBSMarkdownViewer停止.commandを利用してください
+
+## 表示確認
+
+- http://localhost:8080/
+- 上記URLに表示されるのでOBSのソース、ブラウザやウインドウ取り込みなどでご利用ください
+
 # 操作方法（配信中）
 
 このツールは、ローカルで起動している操作用 HTTP API に
