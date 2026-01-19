@@ -11,7 +11,7 @@
 }
 
 /* =========================
-   h1 / Title
+   Title（h1）
 ========================= */
 
 .board-title {
@@ -20,7 +20,7 @@
 }
 
 /* =========================
-   h2 / Section
+   Section（h2）
 ========================= */
 
 h2 {
@@ -29,7 +29,7 @@ h2 {
 }
 
 /* =========================
-   Items（通常）
+   Item（通常）
 ========================= */
 
 .topic-item {
@@ -39,10 +39,28 @@ h2 {
 }
 
 /* =========================
-   Current
+   Item（current）
 ========================= */
 
 .topic-item.current {
   background: #E8DAEF;
   color: #2C2C2C;
+
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* =========================
+   Animation
+========================= */
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+  }
 }

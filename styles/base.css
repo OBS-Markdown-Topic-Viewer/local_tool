@@ -11,7 +11,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;                /* ★ 高さフル */
+  height: 100%;
 }
 
 body {
@@ -26,7 +26,7 @@ body {
 
 .topic-board {
   width: 100%;
-  min-height: 100vh;           /* ★ 縦もブラウザいっぱい */
+  min-height: 100vh;
   padding: clamp(12px, 3vw, 20px);
 
   display: flex;
@@ -35,7 +35,7 @@ body {
 }
 
 /* =========================
-   h1 / Title
+   Title（h1）
 ========================= */
 
 h1,
@@ -60,7 +60,7 @@ h1,
 }
 
 /* =========================
-   h2 / Section
+   Section（h2）
 ========================= */
 
 h2 {
@@ -90,8 +90,7 @@ h2 {
   list-style: none;
   padding: 0;
   margin: 0;
-
-  flex: 1;                     /* ★ 高さを埋める */
+  flex: 1;
 }
 
 /* =========================
@@ -113,7 +112,6 @@ h2 {
   word-break: break-word;
   overflow-wrap: anywhere;
 
-  /* ★ 非currentでも見えるように */
   background: rgba(255, 255, 255, 0.35);
   border: 1px solid rgba(0, 0, 0, 0.15);
 
@@ -121,7 +119,7 @@ h2 {
 }
 
 /* =========================
-   Current item
+   Item（current）
 ========================= */
 
 .topic-item.current {
@@ -137,7 +135,10 @@ h2 {
   padding-left: calc(1.2em + clamp(16px, 4vw, 22px));
 }
 
-/* ▶ マーカー */
+/* =========================
+   Current Marker
+========================= */
+
 .topic-item.current::before {
   content: "▶";
   position: absolute;
@@ -152,7 +153,6 @@ h2 {
   color: currentColor;
 }
 
-/* NOW バッジ */
 .topic-item.current::after {
   content: "NOW";
   position: absolute;
@@ -171,10 +171,39 @@ h2 {
 }
 
 /* =========================
-   Done item
+   Item（done）
 ========================= */
 
 .topic-item.done {
   opacity: 0.5;
   text-decoration: line-through;
+}
+
+/* =========================
+   Advertisement Block
+========================= */
+
+.ad-block {
+  width: 100%;
+  margin: 20px 0;
+  padding: clamp(12px, 3vw, 20px);
+
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ad-block img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.ad-text {
+  font-size: clamp(14px, 4vw, 20px);
+  font-weight: 700;
+  text-align: center;
 }
