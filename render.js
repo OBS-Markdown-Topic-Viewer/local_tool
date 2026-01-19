@@ -24,7 +24,9 @@ for (const line of lines) {
 
   if (line.startsWith(":::ad")) {
     inAd = true;
-    ad = { bg: line.match(/bg=([#A-Za-z0-9]+)/)?.[1] || "#ffffff" };
+    ad = {
+      bg: line.match(/bg=([#A-Za-z0-9]+)/)?.[1] || "#ffffff"
+    };
     continue;
   }
 
@@ -37,6 +39,8 @@ for (const line of lines) {
 
   if (inAd) {
     if (line.startsWith("画像:")) ad.image = line.replace("画像:", "").trim();
+    if (line.startsWith("動画:")) ad.video = line.replace("動画:", "").trim();
+    if (line.startsWith("YouTube:")) ad.youtube = line.replace("YouTube:", "").trim();
     if (line.startsWith("テキスト:")) ad.text = line.replace("テキスト:", "").trim();
     continue;
   }
@@ -62,6 +66,16 @@ const css =
   fs.readFileSync(`./styles/theme-${theme}.css`, "utf8");
 
 /* -------------------------
+   youtube id helper
+------------------------- */
+function getYoutubeId(url) {
+  const m =
+    url.match(/v=([^&]+)/) ||
+    url.match(/youtu\.be\/([^?]+)/);
+  return m ? m[1] : null;
+}
+
+/* -------------------------
    html render
 ------------------------- */
 const html = `
@@ -76,22 +90,51 @@ const html = `
   <div class="board-title">${title}</div>
   <ul class="topic-list">
     ${blocks.map(b => {
-      if (b.type === "h2") return "<h2>" + b.text + "</h2>";
-      if (b.type === "item")
+      if (b.type === "h2") {
+        return "<h2>" + b.text + "</h2>";
+      }
+      if (b.type === "item") {
         return "<li class='topic-item' data-index='" + b.index + "'>" + b.text + "</li>";
-      if (b.type === "ad")
-        return "<div class='ad-block' style='background:" + b.bg + "'>" +
-               (b.image ? "<img src='" + b.image + "'>" : "") +
-               (b.text ? "<div class='ad-text'>" + b.text + "</div>" : "") +
-               "</div>";
+      }
+      if (b.type === "ad") {
+        let media = "";
+
+        if (b.youtube) {
+          const id = getYoutubeId(b.youtube);
+          if (id) {
+            media =
+              "<div class='ad-media-16x9'>" +
+              "<iframe src='https://www.youtube.com/embed/" + id +
+              "?rel=0&autoplay=1&mute=1&loop=1&playlist=" + id +
+              "' allow='autoplay; encrypted-media' allowfullscreen></iframe>" +
+              "</div>";
+          }
+        }
+        else if (b.video) {
+          media =
+            "<div class='ad-media-16x9'>" +
+            "<video src='" + b.video + "' autoplay muted loop playsinline></video>" +
+            "</div>";
+        }
+        else if (b.image) {
+          media = "<img src='" + b.image + "'>";
+        }
+
+        return (
+          "<div class='ad-block' style='background:" + b.bg + "'>" +
+          media +
+          (b.text ? "<div class='ad-text'>" + b.text + "</div>" : "") +
+          "</div>"
+        );
+      }
       return "";
     }).join("")}
   </ul>
 </div>
 
 <script>
-let lastState = "";
-let lastHtmlTime = null;
+let lastStateText = "";
+let lastTheme = document.body.dataset.theme;
 
 /* -------------------------
    state sync
@@ -100,40 +143,32 @@ async function syncState() {
   try {
     const res = await fetch("/state.json?_=" + Date.now());
     const text = await res.text();
-    if (text !== lastState) {
-      lastState = text;
-      const state = JSON.parse(text);
+    if (text === lastStateText) return;
 
-      document.querySelectorAll(".topic-item").forEach(el => {
-        el.classList.toggle(
-          "current",
-          Number(el.dataset.index) === state.current
-        );
-      });
+    lastStateText = text;
+    const state = JSON.parse(text);
 
-      document.querySelectorAll(".ad-block").forEach(el => {
-        el.style.display = state.showAd ? "" : "none";
-      });
-    }
-  } catch {}
-}
+    /* current */
+    document.querySelectorAll(".topic-item").forEach(el => {
+      el.classList.toggle(
+        "current",
+        Number(el.dataset.index) === state.current
+      );
+    });
 
-/* -------------------------
-   html update detect
-------------------------- */
-async function checkHtmlUpdate() {
-  try {
-    const res = await fetch("/", { method: "HEAD" });
-    const lm = res.headers.get("Last-Modified");
-    if (lastHtmlTime && lm !== lastHtmlTime) {
+    /* ad on/off */
+    document.querySelectorAll(".ad-block").forEach(el => {
+      el.style.display = state.showAd ? "" : "none";
+    });
+
+    /* theme change → reload */
+    if (state.theme !== lastTheme) {
       location.reload();
     }
-    lastHtmlTime = lm;
   } catch {}
 }
 
 setInterval(syncState, 300);
-setInterval(checkHtmlUpdate, 1000);
 </script>
 </body>
 </html>
