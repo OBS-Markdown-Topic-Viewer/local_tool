@@ -25,11 +25,19 @@
 :::
 
 :::ad
-画像: images/ad_banner.png
+画像: images/banner_image.jpg
 :::
 
 :::ad bg=#E8F8F5
-画像: images/new_goods.png
+画像: images/banner_image.jpg
 テキスト: 🎉 新作グッズ発売中！詳細は概要欄へ！
 :::
 
+:::ad bg=#FFF3CD
+動画: videos/campaign.webm
+:::
+
+:::ad bg=#FDEDEC
+YouTube: https://www.youtube.com/watch?v=uhsjeP2VhVM
+テキスト: 📺 最新PVはこちら！
+:::
