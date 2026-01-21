@@ -27,7 +27,12 @@ body {
 .topic-board {
   width: 100%;
   min-height: 100vh;
-  padding: clamp(12px, 3vw, 20px);
+
+  padding-top: clamp(12px, 3vw, 20px);
+  padding-bottom: clamp(12px, 3vw, 20px);
+
+  padding-left: calc(clamp(12px, 3vw, 20px) + 24px);
+  padding-right: calc(clamp(12px, 3vw, 20px) + 24px);
 
   display: flex;
   flex-direction: column;

@@ -1,8 +1,14 @@
 import fs from "fs";
 
+/* -------------------------
+   state / theme
+------------------------- */
 const state = JSON.parse(fs.readFileSync("./state.json", "utf8"));
 const theme = state.theme || "aotori";
 
+/* -------------------------
+   markdown load
+------------------------- */
 const src = fs.readFileSync("./md/topic.md", "utf8");
 const lines = src.split("\n");
 
@@ -93,9 +99,11 @@ const html = `
       if (b.type === "h2") {
         return "<h2>" + b.text + "</h2>";
       }
+
       if (b.type === "item") {
         return "<li class='topic-item' data-index='" + b.index + "'>" + b.text + "</li>";
       }
+
       if (b.type === "ad") {
         let media = "";
 
@@ -120,13 +128,17 @@ const html = `
           media = "<img src='" + b.image + "'>";
         }
 
+        /* ★ 初期表示制御（広告フラッシュ対策） */
         return (
-          "<div class='ad-block' style='background:" + b.bg + "'>" +
+          "<div class='ad-block' style='background:" + b.bg + ";" +
+          (state.showAd ? "" : "display:none;") +
+          "'>" +
           media +
           (b.text ? "<div class='ad-text'>" + b.text + "</div>" : "") +
           "</div>"
         );
       }
+
       return "";
     }).join("")}
   </ul>
@@ -135,6 +147,7 @@ const html = `
 <script>
 let lastStateText = "";
 let lastTheme = document.body.dataset.theme;
+let lastModified = null;
 
 /* -------------------------
    state sync
@@ -143,32 +156,49 @@ async function syncState() {
   try {
     const res = await fetch("/state.json?_=" + Date.now());
     const text = await res.text();
-    if (text === lastStateText) return;
+    if (text !== lastStateText) {
+      lastStateText = text;
+      const state = JSON.parse(text);
 
-    lastStateText = text;
-    const state = JSON.parse(text);
+      /* current */
+      document.querySelectorAll(".topic-item").forEach(el => {
+        el.classList.toggle(
+          "current",
+          Number(el.dataset.index) === state.current
+        );
+      });
 
-    /* current */
-    document.querySelectorAll(".topic-item").forEach(el => {
-      el.classList.toggle(
-        "current",
-        Number(el.dataset.index) === state.current
-      );
-    });
+      /* ad on/off */
+      document.querySelectorAll(".ad-block").forEach(el => {
+        el.style.display = state.showAd ? "" : "none";
+      });
 
-    /* ad on/off */
-    document.querySelectorAll(".ad-block").forEach(el => {
-      el.style.display = state.showAd ? "" : "none";
-    });
-
-    /* theme change → reload */
-    if (state.theme !== lastTheme) {
-      location.reload();
+      /* theme change */
+      if (state.theme !== lastTheme) {
+        location.reload();
+      }
     }
   } catch {}
 }
 
-setInterval(syncState, 300);
+/* -------------------------
+   index.html 更新検知（topic.md 用）
+------------------------- */
+async function watchIndex() {
+  try {
+    const res = await fetch("/", { method: "HEAD" });
+    const lm = res.headers.get("Last-Modified");
+    if (lastModified && lm && lm !== lastModified) {
+      location.reload();
+    }
+    lastModified = lm;
+  } catch {}
+}
+
+setInterval(() => {
+  syncState();
+  watchIndex();
+}, 500);
 </script>
 </body>
 </html>
