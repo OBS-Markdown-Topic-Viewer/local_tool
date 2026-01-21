@@ -12,6 +12,7 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden; /* 横揺れ対策 */
 }
 
 body {
@@ -100,6 +101,7 @@ h2 {
 ========================= */
 
 .topic-item {
+  position: relative;
   width: 100%;
   margin-bottom: clamp(10px, 3vw, 16px);
 
@@ -116,17 +118,75 @@ h2 {
 
   background: rgba(255, 255, 255, 0.35);
   border: 1px solid rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+/* 非選択でも背景に同化しない */
+.topic-item:not(.current):not(.current-2):not(.current-3) {
+  opacity: 0.9;
 }
 
 /* =========================
-   Item（current）
+   Cursor Mark（共通）
+========================= */
+
+.topic-item::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* =========================
+   Cursor 1
 ========================= */
 
 .topic-item.current {
-  position: relative;
   font-weight: 800;
   border: 3px solid currentColor;
-  transform: scale(1.04);
+  transform: translateX(6px) scale(1.03);
+}
+
+.topic-item.current::before {
+  opacity: 1;
+}
+
+/* =========================
+   Cursor 2
+========================= */
+
+.topic-item.current-2 {
+  font-weight: 700;
+  border: 3px dashed currentColor;
+  transform: translateX(12px) scale(1.02);
+}
+
+.topic-item.current-2::before {
+  opacity: 1;
+}
+
+/* =========================
+   Cursor 3
+========================= */
+
+.topic-item.current-3 {
+  font-weight: 700;
+  border: 3px dotted currentColor;
+  transform: translateX(18px) scale(1.01);
+}
+
+.topic-item.current-3::before {
+  opacity: 1;
 }
 
 /* =========================

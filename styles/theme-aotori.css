@@ -39,7 +39,7 @@ h2 {
 }
 
 /* =========================
-   Item（current）
+   Cursor 1（current）
 ========================= */
 
 .topic-item.current {
@@ -47,6 +47,40 @@ h2 {
   color: #1B2631;
 
   animation: slide-horizontal 1.2s ease-in-out infinite alternate;
+}
+
+.topic-item.current::before {
+  background: #F1C40F;
+}
+
+/* =========================
+   Cursor 2
+========================= */
+
+.topic-item.current-2 {
+  background: #D6EAF8;
+  color: #154360;
+
+  animation: slide-horizontal 1.2s ease-in-out infinite alternate;
+}
+
+.topic-item.current-2::before {
+  background: #3498DB;
+}
+
+/* =========================
+   Cursor 3
+========================= */
+
+.topic-item.current-3 {
+  background: #FADBD8;
+  color: #641E16;
+
+  animation: slide-horizontal 1.2s ease-in-out infinite alternate;
+}
+
+.topic-item.current-3::before {
+  background: #E74C3C;
 }
 
 /* =========================

@@ -15,13 +15,35 @@ const INDEX_HTML = path.join(PUBLIC_DIR, "index.html");
 function loadState() {
   try {
     const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+
+    let cursorMode = "single";
+    if (raw.cursorMode === "double" || raw.cursorMode === "triple") {
+      cursorMode = raw.cursorMode;
+    }
+    // 旧 mode 吸収
+    if (raw.mode === "multi") {
+      cursorMode = "triple";
+    }
+
     return {
-      current: Number.isInteger(raw.current) ? raw.current : 0,
+      cursorMode,
+      current: Array.isArray(raw.current)
+        ? [
+            raw.current[0] ?? 0,
+            raw.current[1] ?? 0,
+            raw.current[2] ?? 0
+          ]
+        : [raw.current ?? 0, 0, 0],
       theme: typeof raw.theme === "string" ? raw.theme : "aotori",
       showAd: typeof raw.showAd === "boolean" ? raw.showAd : true
     };
   } catch {
-    return { current: 0, theme: "aotori", showAd: true };
+    return {
+      cursorMode: "single",
+      current: [0, 0, 0],
+      theme: "aotori",
+      showAd: true
+    };
   }
 }
 
@@ -47,7 +69,7 @@ function render() {
    startup
 ------------------------- */
 const startupState = loadState();
-startupState.current = 0;
+startupState.current = [startupState.current[0], 0, 0];
 saveState(startupState);
 render();
 
@@ -68,28 +90,70 @@ setInterval(() => {
 /* -------------------------
    API
 ------------------------- */
+
+/* カーソル数切替 */
+app.post("/cursor/mode/:mode", (req, res) => {
+  const s = loadState();
+
+  if (["single", "double", "triple"].includes(req.params.mode)) {
+    s.cursorMode = req.params.mode;
+    saveState(s);
+  }
+
+  res.send("ok");
+});
+
+/* n番目カーソル進む */
+app.post("/cursor/next/:n", (req, res) => {
+  const s = loadState();
+  const n = Number(req.params.n);
+
+  if (n >= 0 && n < 3) {
+    s.current[n] = Math.max(0, s.current[n] + 1);
+    saveState(s);
+  }
+
+  res.send("ok");
+});
+
+/* n番目カーソル戻る */
+app.post("/cursor/prev/:n", (req, res) => {
+  const s = loadState();
+  const n = Number(req.params.n);
+
+  if (n >= 0 && n < 3) {
+    s.current[n] = Math.max(0, s.current[n] - 1);
+    saveState(s);
+  }
+
+  res.send("ok");
+});
+
+/* 既存互換（0番カーソル） */
 app.post("/next", (_, res) => {
   const s = loadState();
-  s.current++;
+  s.current[0]++;
   saveState(s);
   res.send("ok");
 });
 
 app.post("/prev", (_, res) => {
   const s = loadState();
-  s.current = Math.max(0, s.current - 1);
+  s.current[0] = Math.max(0, s.current[0] - 1);
   saveState(s);
   res.send("ok");
 });
 
+/* theme */
 app.post("/theme/:name", (req, res) => {
   const s = loadState();
   s.theme = req.params.name;
   saveState(s);
-  render(); // テーマ変更時のみHTML再生成
+  render();
   res.send("ok");
 });
 
+/* ad toggle */
 app.post("/ad/toggle", (_, res) => {
   const s = loadState();
   s.showAd = !s.showAd;
@@ -106,7 +170,7 @@ app.get("/state.json", (_, res) => {
 });
 
 /* -------------------------
-   index.html HEAD (mtime)
+   index.html HEAD
 ------------------------- */
 app.head("/", (_, res) => {
   try {
@@ -117,10 +181,10 @@ app.head("/", (_, res) => {
 });
 
 /* -------------------------
-   static serve
+   static
 ------------------------- */
 app.use(express.static(PUBLIC_DIR, {
-  setHeaders: res => {
+  setHeaders(res) {
     res.setHeader("Cache-Control", "no-store");
   }
 }));

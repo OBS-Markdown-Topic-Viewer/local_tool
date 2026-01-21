@@ -39,7 +39,7 @@ h2 {
 }
 
 /* =========================
-   Item（current）
+   Cursor 1
 ========================= */
 
 .topic-item.current {
@@ -47,6 +47,40 @@ h2 {
   color: #2C2C2C;
 
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+.topic-item.current::before {
+  background: #8E44AD;
+}
+
+/* =========================
+   Cursor 2
+========================= */
+
+.topic-item.current-2 {
+  background: #D2B4DE;
+  color: #4A235A;
+
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.topic-item.current-2::before {
+  background: #BB8FCE;
+}
+
+/* =========================
+   Cursor 3
+========================= */
+
+.topic-item.current-3 {
+  background: #F5B7B1;
+  color: #641E16;
+
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.topic-item.current-3::before {
+  background: #EC7063;
 }
 
 /* =========================

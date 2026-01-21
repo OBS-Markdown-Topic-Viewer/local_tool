@@ -22,13 +22,17 @@
 画像: images/banner_image.jpg
 :::
 
+:::ad
+画像: images/anime.gif
+:::
+
 :::ad bg=#E8F8F5
-画像: images/banner_image.jpg
+画像: images/anime.gif
 テキスト: 🎉 新作グッズ発売中！詳細は概要欄へ！
 :::
 
 :::ad bg=#FFF3CD
-動画: videos/campaign.webm
+動画: videos/anime.avi
 :::
 
 :::ad bg=#FDEDEC

@@ -16,7 +16,6 @@ let title = "";
 let index = -1;
 let inAd = false;
 let ad = {};
-
 const blocks = [];
 
 /* -------------------------
@@ -72,16 +71,6 @@ const css =
   fs.readFileSync(`./styles/theme-${theme}.css`, "utf8");
 
 /* -------------------------
-   youtube id helper
-------------------------- */
-function getYoutubeId(url) {
-  const m =
-    url.match(/v=([^&]+)/) ||
-    url.match(/youtu\.be\/([^?]+)/);
-  return m ? m[1] : null;
-}
-
-/* -------------------------
    html render
 ------------------------- */
 const html = `
@@ -96,9 +85,7 @@ const html = `
   <div class="board-title">${title}</div>
   <ul class="topic-list">
     ${blocks.map(b => {
-      if (b.type === "h2") {
-        return "<h2>" + b.text + "</h2>";
-      }
+      if (b.type === "h2") return "<h2>" + b.text + "</h2>";
 
       if (b.type === "item") {
         return "<li class='topic-item' data-index='" + b.index + "'>" + b.text + "</li>";
@@ -106,29 +93,9 @@ const html = `
 
       if (b.type === "ad") {
         let media = "";
+        if (b.image) media = "<img src='" + b.image + "'>";
+        if (b.video) media = "<video src='" + b.video + "' autoplay muted loop playsinline></video>";
 
-        if (b.youtube) {
-          const id = getYoutubeId(b.youtube);
-          if (id) {
-            media =
-              "<div class='ad-media-16x9'>" +
-              "<iframe src='https://www.youtube.com/embed/" + id +
-              "?rel=0&autoplay=1&mute=1&loop=1&playlist=" + id +
-              "' allow='autoplay; encrypted-media' allowfullscreen></iframe>" +
-              "</div>";
-          }
-        }
-        else if (b.video) {
-          media =
-            "<div class='ad-media-16x9'>" +
-            "<video src='" + b.video + "' autoplay muted loop playsinline></video>" +
-            "</div>";
-        }
-        else if (b.image) {
-          media = "<img src='" + b.image + "'>";
-        }
-
-        /* ★ 初期表示制御（広告フラッシュ対策） */
         return (
           "<div class='ad-block' style='background:" + b.bg + ";" +
           (state.showAd ? "" : "display:none;") +
@@ -149,6 +116,12 @@ let lastStateText = "";
 let lastTheme = document.body.dataset.theme;
 let lastModified = null;
 
+function activeCount(mode) {
+  if (mode === "triple") return 3;
+  if (mode === "double") return 2;
+  return 1;
+}
+
 /* -------------------------
    state sync
 ------------------------- */
@@ -160,20 +133,22 @@ async function syncState() {
       lastStateText = text;
       const state = JSON.parse(text);
 
-      /* current */
+      const count = activeCount(state.cursorMode);
+      const cursors = state.current.slice(0, count);
+
       document.querySelectorAll(".topic-item").forEach(el => {
-        el.classList.toggle(
-          "current",
-          Number(el.dataset.index) === state.current
-        );
+        const idx = Number(el.dataset.index);
+        el.classList.remove("current", "current-2", "current-3");
+
+        if (idx === cursors[0]) el.classList.add("current");
+        if (idx === cursors[1]) el.classList.add("current-2");
+        if (idx === cursors[2]) el.classList.add("current-3");
       });
 
-      /* ad on/off */
       document.querySelectorAll(".ad-block").forEach(el => {
         el.style.display = state.showAd ? "" : "none";
       });
 
-      /* theme change */
       if (state.theme !== lastTheme) {
         location.reload();
       }
@@ -182,7 +157,7 @@ async function syncState() {
 }
 
 /* -------------------------
-   index.html 更新検知（topic.md 用）
+   index.html 更新検知
 ------------------------- */
 async function watchIndex() {
   try {
